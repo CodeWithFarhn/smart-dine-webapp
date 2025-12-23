@@ -1,4 +1,5 @@
 import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import heroBg from '../../assets/hero-bg.png';
 
 const HeroSection = () => {
@@ -29,10 +30,12 @@ const HeroSection = () => {
                                     />
                                 </InputGroup>
                             </div>
-                            <Button variant="light" size="lg" className="bg-white text-dark fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-3 border-0 flex-shrink-0 px-4">
-                                <i className="bi bi-calendar-event"></i>
-                                Find Tables
-                            </Button>
+                            <LinkContainer to="/find-tables">
+                                <Button variant="light" size="lg" className="bg-white text-dark fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-3 border-0 flex-shrink-0 px-4">
+                                    <i className="bi bi-calendar-event"></i>
+                                    Find Tables
+                                </Button>
+                            </LinkContainer>
                         </div>
                     </Col>
                 </Row>

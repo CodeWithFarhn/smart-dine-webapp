@@ -2,7 +2,6 @@ import HeroSection from '../components/landing-page/HeroSection';
 import FeaturedRestaurants from '../components/landing-page/FeaturedRestaurants';
 import HowItWorks from '../components/landing-page/HowItWorks';
 import OwnerSection from '../components/landing-page/OwnerSection';
-import Footer from '../components/general/Footer';
 
 const LandingPage = () => {
     return (
@@ -11,7 +10,6 @@ const LandingPage = () => {
             <FeaturedRestaurants />
             <HowItWorks />
             <OwnerSection />
-            <Footer />
         </div>
     );
 };
