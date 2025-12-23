@@ -51,7 +51,7 @@ const RegisterScreen = () => {
 
     return (
         <FormContainer>
-            <h1>Sign Up</h1>
+            <h1 className="font-serif">Sign Up</h1>
             {error && <Alert variant='danger'>{error}</Alert>}
             <Form onSubmit={submitHandler}>
                 <Form.Group className='my-3' controlId='name'>

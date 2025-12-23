@@ -12,7 +12,7 @@ const OwnerSection = () => {
             justifyContent: 'center'
         }}>
             <Container>
-                <h2 className="display-5 fw-bold mb-3">Own a Restaurant?</h2>
+                <h2 className="display-5 fw-bold mb-3 font-serif">Own a Restaurant?</h2>
                 <p className="fs-5 mb-4 d-block mx-auto" style={{ maxWidth: '600px' }}>
                     Join our platform and manage your reservations with ease
                 </p>

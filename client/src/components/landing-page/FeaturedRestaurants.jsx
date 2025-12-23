@@ -34,7 +34,7 @@ const FeaturedRestaurants = () => {
     return (
         <Container className="my-5 pt-4"> {/* Added pt-4 for sticky header offset if needed */}
             <div className="text-center mb-5">
-                <h2 className="display-4 fw-bold mb-3">Featured Restaurants</h2>
+                <h2 className="display-4 fw-bold mb-3 font-serif">Featured Restaurants</h2>
                 <p className="text-muted fs-5">Explore our handpicked selection of exceptional dining experiences</p>
             </div>
 

@@ -2,10 +2,17 @@
   --primary-color: #d94e1e;
   /* Burnt Orange from design */
   --secondary-color: #2c3e50;
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-  --bs-warning: #d94e1e;
-  /* Override bootstrap yellow with our orange */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif) !important;
+}
+
+--bs-warning: #d94e1e;
+/* Override bootstrap yellow with our orange */
 }
 
 body {

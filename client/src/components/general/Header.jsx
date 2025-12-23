@@ -9,13 +9,15 @@ const Header = () => {
                     <LinkContainer to='/'>
                         <Navbar.Brand className="fw-bold fs-4">
                             <i className="bi bi-cup-hot-fill text-warning me-2"></i>
-                            ReserveTable
+                            ReserveEase
                         </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls='basic-navbar-nav' />
                     <Navbar.Collapse id='basic-navbar-nav'>
                         <Nav className='ms-auto align-items-center'>
-                            <Nav.Link href="#" className="fw-semibold me-3">For Restaurants</Nav.Link>
+                            <LinkContainer to='/register-restaurant'>
+                                <Nav.Link className="fw-semibold me-3">For Restaurants</Nav.Link>
+                            </LinkContainer>
                             <LinkContainer to='/login'>
                                 <Nav.Link className="me-2">
                                     Sign In

@@ -13,7 +13,7 @@ const HeroSection = () => {
             <Container>
                 <Row className="justify-content-center">
                     <Col md={10} lg={8}>
-                        <h1 className="display-3 fw-bold mb-4 text-white">Reserve Your Perfect Table</h1>
+                        <h1 className="display-3 fw-bold mb-4 text-white font-serif">Reserve Your Perfect Table</h1>
                         <p className="lead mb-5 fs-4 text-white">Discover and book the finest dining experiences in your city</p>
 
                         <div className="d-flex flex-column flex-md-row gap-3">

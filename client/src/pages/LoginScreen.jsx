@@ -44,7 +44,7 @@ const LoginScreen = () => {
 
     return (
         <FormContainer>
-            <h1>Sign In</h1>
+            <h1 className="font-serif">Sign In</h1>
             {error && <Alert variant='danger'>{error}</Alert>}
             <Form onSubmit={submitHandler}>
                 <Form.Group className='my-3' controlId='email'>
