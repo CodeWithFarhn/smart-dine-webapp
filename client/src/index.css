@@ -1,0 +1,63 @@
+:root {
+  --primary-color: #d94e1e;
+  /* Burnt Orange from design */
+  --secondary-color: #2c3e50;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --bs-warning: #d94e1e;
+  /* Override bootstrap yellow with our orange */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #fcfbf9;
+  /* Warm off-white */
+  font-family: var(--font-body);
+  color: #333;
+}
+
+#root {
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-1,
+.display-2,
+.display-3 {
+  font-family: var(--font-heading);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #c14013;
+  border-color: #c14013;
+}
+
+/* Custom Card Styling */
+.restaurant-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.badge-custom {
+  background-color: #f3f3f3;
+  color: #555;
+  font-weight: 500;
+  padding: 6px 12px;
+}
