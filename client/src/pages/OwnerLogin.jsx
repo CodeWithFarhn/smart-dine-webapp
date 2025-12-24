@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import AuthLayout from '../components/auth/AuthLayout';
 
-const LoginScreen = () => {
+const OwnerLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -17,7 +17,8 @@ const LoginScreen = () => {
         setError('');
 
         try {
-            // Mock Login Logic for prototype
+            // Mock Login for Owners
+            // In a real app, this would hit a separate endpoint or send a role flag
             const res = await fetch('/api/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,20 +26,20 @@ const LoginScreen = () => {
             });
             const data = await res.json();
 
-            // Allow mock login if backend not ready or for demo
-            if (res.ok || (email === 'demo@user.com')) {
-                const userInfo = res.ok ? data : { name: 'Demo User', email: 'demo@user.com' };
+            // Allow mock login for demo purposes
+            if (res.ok || (email === 'owner@restaurant.com')) {
+                const userInfo = res.ok ? data : { name: 'Restaurant Owner', email: 'owner@restaurant.com', role: 'owner' };
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                navigate('/');
+                navigate('/manage/dashboard');
                 window.location.reload();
             } else {
                 setError(data.message || 'Invalid email or password');
             }
         } catch (err) {
-            // Fallback for demo if API fails
-            if (email === 'demo@user.com') {
-                localStorage.setItem('userInfo', JSON.stringify({ name: 'Demo User', email: 'demo@user.com' }));
-                navigate('/');
+            // Fallback for demo
+            if (email === 'owner@restaurant.com') {
+                localStorage.setItem('userInfo', JSON.stringify({ name: 'Restaurant Owner', email: 'owner@restaurant.com', role: 'owner' }));
+                navigate('/manage/dashboard');
                 window.location.reload();
             } else {
                 setError('Something went wrong. Please try again.');
@@ -50,9 +51,9 @@ const LoginScreen = () => {
 
     return (
         <AuthLayout
-            title="Welcome Back"
-            subtitle="Sign in to continue to your account"
-            imageSrc="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop"
+            title="Partner Login"
+            subtitle="Manage your restaurant, reservations, and more"
+            imageSrc="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?q=80&w=2070&auto=format&fit=crop"
         >
             {error && <Alert variant='danger' className="mb-4">{error}</Alert>}
 
@@ -61,7 +62,7 @@ const LoginScreen = () => {
                     <Form.Label className="small fw-bold text-uppercase text-secondary">Email Address</Form.Label>
                     <Form.Control
                         type='email'
-                        placeholder='Enter your email'
+                        placeholder='owner@restaurant.com'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="p-3 bg-light border-0"
@@ -75,7 +76,7 @@ const LoginScreen = () => {
                     </div>
                     <Form.Control
                         type='password'
-                        placeholder='Enter your password'
+                        placeholder='Enter password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="p-3 bg-light border-0"
@@ -87,27 +88,27 @@ const LoginScreen = () => {
                     type='submit'
                     variant='dark'
                     className='w-100 py-3 fw-bold mt-2'
-                    style={{ backgroundColor: '#2c3e50' }}
+                    style={{ backgroundColor: '#d94e1e', borderColor: '#d94e1e' }}
                 >
-                    {loading ? 'Signing In...' : 'Sign In'}
+                    {loading ? 'Access Dashboard' : 'Login to Dashboard'}
                 </Button>
             </Form>
 
             <div className='py-4 text-center'>
-                <span className="text-secondary">New to ReserveTable? </span>
-                <Link to='/register' className="fw-bold text-decoration-none text-dark">
-                    Create an account
+                <span className="text-secondary">Not a partner yet? </span>
+                <Link to='/restaurant/register' className="fw-bold text-decoration-none text-dark">
+                    Register your restaurant
                 </Link>
             </div>
 
             <div className='text-center border-top pt-4'>
-                <span className="text-secondary small d-block mb-2">Are you a restaurant owner?</span>
-                <Link to='/owner/login' className="fw-bold text-decoration-none text-primary">
-                    Login to Dashboard
+                <span className="text-secondary small d-block mb-2">Looking for a table?</span>
+                <Link to='/login' className="fw-bold text-decoration-none text-primary">
+                    Customer Login
                 </Link>
             </div>
         </AuthLayout>
     );
 };
 
-export default LoginScreen;
+export default OwnerLogin;

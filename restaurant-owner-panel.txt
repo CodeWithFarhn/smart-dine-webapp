@@ -1,0 +1,93 @@
+ Restaurant Owner Panel - Feature Report
+Main Navigation Areas
+1. Dashboard Home
+Key Statistics Cards:
+
+Today's reservations count
+Upcoming reservations count
+Capacity utilization percentage
+Revenue display
+Today's Reservations View:
+
+List of current day reservations with customer details
+Reservation confirmation status
+Quick actions: Confirm, Cancel, Contact
+2. Reservations Management
+Tabbed Filtering System:
+View All reservations
+Today's reservations
+Upcoming reservations
+Past reservations
+Reservation Details Table:
+Customer name
+Reservation date & time
+Party size
+Phone & email contact
+Status badges (Confirmed, Pending, Cancelled)
+Action buttons for confirmation, cancellation, and customer contact
+3. Configuration Section (New)
+Table Configuration (/manage/tables)
+
+Add/edit/delete tables
+Set seating capacity (1-20 seats)
+Table type selection (Standard, Booth, Window, Bar)
+Organize tables by sections (Main Dining, Outdoor, Private, Bar Area, Lounge)
+Edit and delete existing tables with inline editing
+Booking Rules Configuration (/manage/rules)
+
+Party Size Rules: Min/max party sizes (1-20 people)
+Booking Duration: Set reservation lengths (30-180 minutes)
+Advance Booking Window: Min/max booking advance notice
+Seating Flexibility:
+Exact-fit table preference toggle
+Over-capacity seating with threshold percentage
+Partial booking support (combine tables)
+Orphan seat threshold settings
+Peak Hours: Define busy period times
+Special Policies: Walk-in acceptance, phone confirmation requirement
+Operating Hours & Availability (/manage/availability)
+
+Weekly Schedule: Set operating hours for each day (Mon-Sun)
+Multiple Time Slots: Support split hours (lunch & dinner service)
+Day Toggles: Open/close restaurants by day
+Blackout Dates: Block specific dates for closures, holidays, maintenance
+4. Restaurant Settings (Accessible from Main Navigation)
+Restaurant profile information
+Integration settings
+Notification preferences
+Logo/branding configuration
+5. Restaurant Registration (Onboarding Flow)
+3-Step Registration Process:
+Step 1: Basic restaurant information (name, cuisine, price range, description)
+Step 2: Location details (address, city, state, zip)
+Step 3: Contact & operating hours (phone, email, hours)
+Progress indicator
+Form validation
+Completion confirmation
+Key Features Across All Sections
+✅ Navigation & Layout
+
+Responsive sidebar navigation with collapsible menu
+Sticky header with theme toggle
+Color-coded navigation for easy section identification
+✅ Data Management
+
+Real-time form validation
+Save/update functionality for all configurations
+Toast notifications for user feedback
+Status indicators for reservations and tables
+✅ Styling & UX
+
+Full dark mode support
+Professional Material Design with orange accent color (primary)
+Responsive design (mobile, tablet, desktop)
+Proper spacing and typography hierarchy
+Comprehensive test IDs for automation
+✅ Interactivity
+
+Interactive table management with add/remove capabilities
+Reservation action buttons (confirm, cancel, contact)
+Tabbed interface for filtering
+Toggle switches for feature enablement
+Sliders for threshold configuration
+Time pickers for schedule management

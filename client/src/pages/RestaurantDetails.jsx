@@ -39,6 +39,41 @@ const mockRestaurants = {
             'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=800&q=80'  // Sushi
         ]
     },
+    '3': {
+        name: 'Le Petit Bistro',
+        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+        rating: 4.9,
+        reviewCount: 428,
+        cuisine: 'French',
+        priceRange: '$$$$',
+        location: 'Arts District',
+        address: '789 Boulevard Saint-Germain, Arts District',
+        description: "A cozy and romantic French bistro serving classic dishes like Coq au Vin, Escargots, and freshly baked pastries. Perfect for date nights and special occasions.",
+        gallery: [
+            'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1608855238293-a8853e7f7c98?auto=format&fit=crop&w=800&q=80', // French food/plating
+            'https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=800&q=80'  // Ambience reuse
+        ]
+    },
+
+
+    '4': {
+        name: 'Spice Garden',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+        rating: 4.5,
+        reviewCount: 187,
+        cuisine: 'Indian',
+        priceRange: '$$',
+        location: 'East Side',
+        address: '321 Spice Route, East Side',
+        description: "Experience the vibrant flavors of India with our authentic curries, tandoori specialties, and freshly baked naan breads. A feast for the senses.",
+        gallery: [
+            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1585937421612-70a008356f36?auto=format&fit=crop&w=800&q=80', // Curry
+            'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80'  // Indian food
+        ]
+    },
+
     // Fallback for others
     'default': {
         name: 'Restaurant Name',

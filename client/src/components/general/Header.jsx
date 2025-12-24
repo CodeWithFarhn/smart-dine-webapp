@@ -4,29 +4,30 @@ import { LinkContainer } from 'react-router-bootstrap';
 const Header = () => {
     return (
         <header>
-            <Navbar bg='white' variant='light' expand='lg' collapseOnSelect fixed="top" className="shadow-sm py-3 border-bottom">
+            <Navbar bg="white" variant="light" expand="lg" collapseOnSelect className="py-3 border-bottom sticky-top shadow-sm">
                 <Container>
-                    <LinkContainer to='/'>
-                        <Navbar.Brand className="fw-bold fs-4">
-                            <i className="bi bi-cup-hot-fill text-warning me-2"></i>
-                            ReserveEase
+                    <LinkContainer to="/">
+                        <Navbar.Brand className="font-serif fw-bold fs-3 text-dark d-flex align-items-center gap-2">
+                            <span className="rounded-circle d-flex align-items-center justify-content-center text-white" style={{ width: 40, height: 40, backgroundColor: '#d94e1e' }}>
+                                <i className="bi bi-shop"></i>
+                            </span>
+                            ReserveTable
                         </Navbar.Brand>
                     </LinkContainer>
-                    <Navbar.Toggle aria-controls='basic-navbar-nav' />
-                    <Navbar.Collapse id='basic-navbar-nav'>
-                        <Nav className='ms-auto align-items-center'>
-                            <LinkContainer to='/register-restaurant'>
-                                <Nav.Link className="fw-semibold me-3">For Restaurants</Nav.Link>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="ms-auto align-items-center">
+                            <LinkContainer to="/find-tables">
+                                <Nav.Link className="mx-2 fw-medium text-secondary">Find Tables</Nav.Link>
                             </LinkContainer>
-                            <LinkContainer to='/login'>
-                                <Nav.Link className="me-2">
-                                    Sign In
-                                </Nav.Link>
+                            <LinkContainer to="/owner/login">
+                                <Nav.Link className="mx-2 fw-medium text-secondary">For Restaurants</Nav.Link>
                             </LinkContainer>
-                            <LinkContainer to='/register'>
-                                <Button className="rounded-pill px-4 fw-bold" style={{ backgroundColor: '#2c3e50', border: 'none' }}>
-                                    Sign Up
-                                </Button>
+                            <LinkContainer to="/login">
+                                <Button variant="outline-dark" className="ms-3 rounded-pill px-4 fw-bold">Sign In</Button>
+                            </LinkContainer>
+                            <LinkContainer to="/register">
+                                <Button variant="dark" className="ms-2 rounded-pill px-4 fw-bold" style={{ backgroundColor: '#d94e1e', borderColor: '#d94e1e' }}>Sign Up</Button>
                             </LinkContainer>
                         </Nav>
                     </Navbar.Collapse>
