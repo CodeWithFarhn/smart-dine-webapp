@@ -8,7 +8,7 @@ const reservationSchema = mongoose.Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        required: false, // Can be guest booking
+        required: false, 
         ref: 'User'
     },
     table: {

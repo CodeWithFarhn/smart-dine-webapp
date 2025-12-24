@@ -17,7 +17,6 @@ const LoginScreen = () => {
         setError('');
 
         try {
-            // Mock Login Logic for prototype
             const res = await fetch('/api/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -34,7 +33,7 @@ const LoginScreen = () => {
             } else {
                 setError(data.message || 'Invalid email or password');
             }
-        } catch (err) {
+        } catch {
             // Fallback for demo if API fails
             if (email === 'demo@user.com') {
                 localStorage.setItem('userInfo', JSON.stringify({ name: 'Demo User', email: 'demo@user.com' }));
