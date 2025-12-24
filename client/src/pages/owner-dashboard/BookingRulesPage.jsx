@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 
@@ -19,10 +19,50 @@ const BookingRulesPage = () => {
         allowWalkIns: true,
         phoneConfirmationRequired: false,
     });
+    const [restaurantId, setRestaurantId] = useState(null);
 
-    const handleSave = () => {
-        console.log("Booking rules saved:", rules);
-        alert("Your booking rules have been updated.");
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (!userInfo) return;
+
+            // Get restaurant
+            const restRes = await fetch(`/api/restaurants`, { headers: { Authorization: `Bearer ${userInfo.token}` } });
+            const all = await res.json();
+            const myRest = all.find(r => r.owner === userInfo._id) || all[0];
+
+            if (myRest) {
+                setRestaurantId(myRest._id);
+                if (myRest.bookingSettings) {
+                    setRules(prev => ({ ...prev, ...myRest.bookingSettings }));
+                }
+            }
+        };
+        fetchSettings();
+    }, []);
+
+    const handleSave = async () => {
+        if (!restaurantId) return;
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const res = await fetch(`/api/restaurants/${restaurantId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({ bookingSettings: rules })
+            });
+
+            if (res.ok) {
+                alert("Your booking rules have been updated.");
+            } else {
+                alert("Failed to save rules.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error saving rules.");
+        }
     };
 
     return (

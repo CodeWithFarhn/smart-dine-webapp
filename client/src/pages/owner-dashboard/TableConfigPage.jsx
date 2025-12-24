@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 
@@ -7,14 +7,45 @@ const SECTIONS = ["Main Dining", "Outdoor", "Private", "Bar Area", "Lounge"];
 
 const TableConfigPage = () => {
     // Mock Data
-    const [tables, setTables] = useState([
-        { id: "1", number: 1, capacity: 2, type: "standard", section: "Main Dining" },
-        { id: "2", number: 2, capacity: 4, type: "standard", section: "Main Dining" },
-        { id: "3", number: 3, capacity: 4, type: "booth", section: "Main Dining" },
-        { id: "4", number: 4, capacity: 6, type: "standard", section: "Outdoor" },
-        { id: "5", number: 5, capacity: 8, type: "standard", section: "Private" },
-        { id: "6", number: 6, capacity: 2, type: "window", section: "Main Dining" },
-    ]);
+    const [tables, setTables] = useState([]);
+
+    // Helper to get restaurant ID
+    const getRestaurantId = async (token, userId) => {
+        const res = await fetch(`/api/restaurants`, { headers: { Authorization: `Bearer ${token}` } });
+        const all = await res.json();
+        const myRest = all.find(r => r.owner === userId) || all[0];
+        return myRest ? myRest._id : null;
+    };
+
+    // Fetch Tables
+    const fetchTables = async () => {
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (!userInfo) return;
+            const restId = await getRestaurantId(userInfo.token, userInfo._id);
+
+            if (restId) {
+                const res = await fetch(`/api/tables/restaurant/${restId}`);
+                const data = await res.json();
+                // Map backend data to UI format if needed
+                const mapped = data.map(t => ({
+                    id: t._id,
+                    number: t.name.replace('Table ', ''), // Assuming 'Table X' format
+                    capacity: t.capacity,
+                    type: t.type,
+                    section: t.section
+                }));
+                setTables(mapped);
+            }
+        } catch (err) {
+            console.error("Failed to fetch tables", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchTables();
+    }, []);
+
 
     const [newTable, setNewTable] = useState({
         number: "",
@@ -23,26 +54,57 @@ const TableConfigPage = () => {
         section: "Main Dining",
     });
 
-    const addTable = () => {
+    const addTable = async () => {
         if (!newTable.number || !newTable.capacity) {
-            alert("Error: Please fill in all fields"); // Replaced toast with alert for now as per stack
+            alert("Error: Please fill in all fields");
             return;
         }
 
-        const table = {
-            id: String(Date.now()),
-            number: parseInt(newTable.number),
-            capacity: parseInt(newTable.capacity),
-            type: newTable.type,
-            section: newTable.section,
-        };
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const restId = await getRestaurantId(userInfo.token, userInfo._id);
 
-        setTables([...tables, table]);
-        setNewTable({ number: "", capacity: "", type: "standard", section: "Main Dining" });
+            if (!restId) return alert("No restaurant found");
+
+            const res = await fetch('/api/tables', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({
+                    number: newTable.number,
+                    capacity: newTable.capacity,
+                    type: newTable.type,
+                    section: newTable.section,
+                    restaurantId: restId
+                })
+            });
+
+            if (res.ok) {
+                fetchTables(); // Refresh list
+                setNewTable({ number: "", capacity: "", type: "standard", section: "Main Dining" });
+            } else {
+                alert("Failed to add table");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error adding table");
+        }
     };
 
-    const deleteTable = (id) => {
-        setTables(tables.filter(t => t.id !== id));
+    const deleteTable = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            await fetch(`/api/tables/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${userInfo.token}` }
+            });
+            fetchTables(); // Refresh
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const groupedTables = SECTIONS.reduce((acc, section) => {
@@ -173,18 +235,7 @@ const TableConfigPage = () => {
                     ))}
                 </div>
 
-                <div className="mb-5">
-                    <Button
-                        variant="dark"
-                        style={{ backgroundColor: '#d94e1e', borderColor: '#d94e1e' }}
-                        size="lg"
-                        className="w-100" // Optional: make it full width or fixed width as per preference, sticking to consistent styling
-                        onClick={() => console.log('Settings saved')}
-                    >
-                        <i className="bi bi-save me-2"></i>
-                        Save All Changes
-                    </Button>
-                </div>
+
 
             </div>
         </DashboardLayout>

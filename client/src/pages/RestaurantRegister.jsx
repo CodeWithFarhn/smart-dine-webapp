@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Row, Col, Form, Button, Card, ProgressBar } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, ProgressBar, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const RestaurantRegister = () => {
@@ -52,21 +52,77 @@ const RestaurantRegister = () => {
         window.scrollTo(0, 0);
     };
 
-    const submitHandler = (e) => {
+    const [loading, setLoading] = useState(false);
+
+    const submitHandler = async (e) => {
         e.preventDefault();
-        console.log('Final Submission:', formData);
+        setLoading(true);
 
-        // Simulate registration
-        localStorage.setItem('userInfo', JSON.stringify({
-            name: formData.restaurantName + ' Owner',
-            email: formData.email,
-            role: 'owner',
-            restaurantName: formData.restaurantName
-        }));
+        try {
+            // 1. Register User (Owner)
+            const userResponse = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: `Owner of ${formData.restaurantName}`,
+                    email: formData.email,
+                    password: formData.password,
+                    role: 'owner'
+                })
+            });
 
-        alert('Restaurant Registration Completed! Redirecting to Dashboard...');
-        navigate('/manage/dashboard');
-        window.location.reload();
+            const userData = await userResponse.json();
+
+            if (!userResponse.ok) {
+                throw new Error(userData.message || 'Failed to create owner account');
+            }
+
+            // Store user info (including token)
+            localStorage.setItem('userInfo', JSON.stringify(userData));
+
+            // 2. Register Restaurant
+            const restaurantResponse = await fetch('/api/restaurants', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userData.token}`
+                },
+                body: JSON.stringify({
+                    name: formData.restaurantName,
+                    cuisineType: formData.cuisineType,
+                    priceRange: formData.priceRange,
+                    description: formData.description,
+                    address: {
+                        street: formData.streetAddress,
+                        city: formData.city,
+                        state: formData.state,
+                        zipCode: formData.zipCode
+                    },
+                    phone: formData.phone,
+                    email: formData.email, // Using owner email for restaurant contact for now
+                    operatingHours: {
+                        monFri: formData.hoursMonFri,
+                        sat: formData.hoursSat,
+                        sun: formData.hoursSun
+                    }
+                })
+            });
+
+            const restaurantData = await restaurantResponse.json();
+
+            if (!restaurantResponse.ok) {
+                throw new Error(restaurantData.message || 'Failed to register restaurant');
+            }
+
+            alert('Restaurant Registration Completed! Redirecting to Dashboard...');
+            navigate('/manage/dashboard');
+            window.location.reload();
+
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Calculate progress

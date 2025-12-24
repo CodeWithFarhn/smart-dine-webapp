@@ -95,17 +95,45 @@ const mockRestaurants = {
 
 const RestaurantDetails = () => {
     const { id } = useParams();
-    const [restaurant, setRestaurant] = useState(mockRestaurants['default']);
+    const [restaurant, setRestaurant] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [selectedTable, setSelectedTable] = useState(null);
 
     useEffect(() => {
-        if (id && mockRestaurants[id]) {
-            setRestaurant(mockRestaurants[id]);
-        }
+        const fetchRestaurant = async () => {
+            try {
+                const res = await fetch(`/api/restaurants/${id}`);
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Map or use data directly. Using placeholder images for seeded data.
+                    setRestaurant({
+                        ...data,
+                        id: data._id, // Ensure ID is available for BookingWidget
+                        image: data.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+                        rating: 4.5,
+                        reviewCount: 0,
+                        gallery: [
+                            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+                            'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=80',
+                            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'
+                        ]
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch restaurant details", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) fetchRestaurant();
     }, [id]);
 
+    if (loading || !restaurant) return <div className="text-center py-5 mt-5">Loading...</div>;
+
     const handleReserve = () => {
-        alert(`Reservation requested for ${restaurant.name} at ${selectedTable?.name || 'a table'}!`);
+        // Callback after successful booking if needed
     };
 
     return (
@@ -180,7 +208,7 @@ const RestaurantDetails = () => {
                     <Col lg={4}>
                         <BookingWidget
                             selectedTable={selectedTable}
-                            restaurantName={restaurant.name}
+                            restaurantName={restaurant} // Passing object instead of just name
                             onReserve={handleReserve}
                         />
                     </Col>

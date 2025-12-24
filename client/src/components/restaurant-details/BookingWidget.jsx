@@ -20,14 +20,50 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
     const timeSlots = ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
     const partySizes = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    const handleConfirm = () => {
-        // Simulate API call
-        console.log("Booking confirmed:", { ...bookingData, table: selectedTable });
-        setStep(2); // Switch to confirmation view
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleConfirm = async () => {
+        try {
+            setLoading(true);
+            setError('');
+
+            const res = await fetch('/api/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    restaurantId: restaurantName.id, // ID passed via props (needs update in parent)
+                    customerName: bookingData.name,
+                    customerEmail: bookingData.email,
+                    customerPhone: bookingData.phone,
+                    date: bookingData.date,
+                    time: bookingData.time,
+                    partySize: bookingData.partySize,
+                    specialRequests: bookingData.specialRequests,
+                    tableId: selectedTable ? selectedTable.id : null // Optional
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Booking failed');
+            }
+
+            console.log("Booking confirmed:", data);
+            setStep(2); // Switch to confirmation view
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleFinalClose = () => {
         setStep(1); // Reset to details
+        setBookingData({ ...bookingData, specialRequests: '', name: '', email: '', phone: '' }); // Clear sensitive fields
         handleClose();
         if (onReserve) onReserve(bookingData);
     };
@@ -69,7 +105,7 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
                 {step === 1 ? (
                     <>
                         <Modal.Header closeButton className="border-0 pb-0">
-                            <Modal.Title className="font-serif fw-bold">Book a Table at {restaurantName}</Modal.Title>
+                            <Modal.Title className="font-serif fw-bold">Book a Table at {restaurantName.name}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body className="pt-2 pb-4 px-4">
                             <p className="text-muted small mb-4">Select your preferred date, time, and party size</p>

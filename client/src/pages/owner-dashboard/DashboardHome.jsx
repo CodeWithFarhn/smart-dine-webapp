@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Row, Col, Card, Table, Button, Dropdown } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 import StatCard from '../../components/owner-dashboard/StatCard';
@@ -9,23 +10,66 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../compone
 
 
 const DashboardHome = () => {
-    // Mock Data
-    const stats = [
-        { label: "Today's Reservations", value: "28", change: "+12% from yesterday", icon: "bi-calendar-event", bg: "bg-white", text: "text-dark" },
-        { label: "Upcoming", value: "145", change: "Next 7 days", icon: "bi-people", bg: "bg-white", text: "text-dark" },
-        { label: "Capacity", value: "72%", change: "For this week", icon: "bi-graph-up-arrow", bg: "bg-white", text: "text-dark" },
-        { label: "Revenue", value: "$4,250", change: "+8% from last month", icon: "bi-currency-dollar", bg: "bg-white", text: "text-dark" }
-    ];
+    const [stats, setStats] = useState([
+        { label: "Today's Reservations", value: "0", change: "+0% from yesterday", icon: "bi-calendar-event", bg: "bg-white", text: "text-dark" },
+        { label: "Upcoming", value: "0", change: "Next 7 days", icon: "bi-people", bg: "bg-white", text: "text-dark" },
+        { label: "Capacity", value: "0%", change: "For this week", icon: "bi-graph-up-arrow", bg: "bg-white", text: "text-dark" },
+        { label: "Revenue", value: "$0", change: "+0% from last month", icon: "bi-currency-dollar", bg: "bg-white", text: "text-dark" }
+    ]);
 
-    const reservations = [
-        { id: 1, customer: "John Smith", date: "Nov 15, 2025", time: "7:00 PM", party: 4, status: "Confirmed" },
-        { id: 2, customer: "Sarah Johnson", date: "Nov 15, 2025", time: "7:30 PM", party: 2, status: "Pending" },
-        { id: 3, customer: "Mike Davis", date: "Nov 16, 2025", time: "8:00 PM", party: 6, status: "Confirmed" },
-        { id: 4, customer: "Emily Wilson", date: "Nov 16, 2025", time: "6:30 PM", party: 3, status: "Confirmed" },
-        { id: 5, customer: "David Brown", date: "Nov 17, 2025", time: "7:00 PM", party: 2, status: "Cancelled" },
-    ];
+    const [reservations, setReservations] = useState([]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                if (!userInfo || !userInfo.token) return;
 
+                // 1. Get Restaurant ID
+                const restRes = await fetch(`/api/restaurants`, {
+                    headers: { Authorization: `Bearer ${userInfo.token}` }
+                });
+                const restaurants = await restRes.json();
+                const myRestaurant = restaurants.find(r => r.owner === userInfo._id) || restaurants[0];
+
+                if (myRestaurant) {
+                    // 2. Get Reservations
+                    const res = await fetch(`/api/reservations/restaurant/${myRestaurant._id}`, {
+                        headers: { Authorization: `Bearer ${userInfo.token}` }
+                    });
+                    const data = await res.json();
+
+                    // Map for Table
+                    const mappedData = data.slice(0, 5).map(r => ({
+                        id: r._id,
+                        customer: r.customerName,
+                        date: r.date,
+                        time: r.time,
+                        party: r.partySize,
+                        status: r.status || 'Pending'
+                    }));
+                    setReservations(mappedData);
+
+                    // Calculate Stats (Basic logic for MVP)
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const todayCount = data.filter(r => r.date === todayStr).length;
+                    const upcomingCount = data.filter(r => r.date > todayStr).length;
+
+                    setStats([
+                        { label: "Today's Reservations", value: todayCount.toString(), change: "Today", icon: "bi-calendar-event", bg: "bg-white", text: "text-dark" },
+                        { label: "Upcoming", value: upcomingCount.toString(), change: "Next 7 days", icon: "bi-people", bg: "bg-white", text: "text-dark" },
+                        { label: "Capacity", value: "N/A", change: "For this week", icon: "bi-graph-up-arrow", bg: "bg-white", text: "text-dark" }, // Complex calc needed
+                        { label: "Revenue", value: "N/A", change: "From bookings", icon: "bi-currency-dollar", bg: "bg-white", text: "text-dark" }
+                    ]);
+                }
+
+            } catch (err) {
+                console.error("Dashboard fetch error", err);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <DashboardLayout title="Dashboard">

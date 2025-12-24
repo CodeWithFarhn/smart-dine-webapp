@@ -1,87 +1,76 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Added useEffect
 import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../components/general/StyledCard';
-import Badge from '../components/general/StyledBadge'; // Default export
+import Badge from '../components/general/StyledBadge';
 
-// import lePetitBistroImg from '../assets/le-petit-bistro.png'; // Use generic image or existing import if available
-
-// Mock Data (including images from unsplash for demo purposes, replicating user's mock data structure)
-const mockRestaurants = [
-    {
-        id: "1",
-        name: "La Bella Italia",
-        cuisine: "Italian",
-        image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=80",
-        rating: 4.8,
-        reviews: 342,
-        priceRange: "$$",
-        location: "Downtown",
-        distance: "0.8 mi",
-        availableTimes: ["5:00 PM", "5:30 PM", "7:00 PM", "8:00 PM"],
-    },
-    {
-        id: "2",
-        name: "Sakura Sushi",
-        cuisine: "Japanese",
-        image: "https://images.unsplash.com/photo-1579027989536-b7b1f875659b?auto=format&fit=crop&w=800&q=80",
-        rating: 4.6,
-        reviews: 215,
-        priceRange: "$$$",
-        location: "Midtown",
-        distance: "1.2 mi",
-        availableTimes: ["6:00 PM", "6:30 PM", "8:30 PM"],
-    },
-    {
-        id: "3",
-        name: "Le Petit Bistro",
-        cuisine: "French",
-        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
-
-
-        rating: 4.9,
-
-        reviews: 428,
-        priceRange: "$$$$",
-        location: "Arts District",
-        distance: "2.1 mi",
-        availableTimes: ["5:30 PM", "7:30 PM", "9:00 PM"],
-    },
-    {
-        id: "4",
-        name: "Spice Garden",
-        cuisine: "Indian",
-        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
-        rating: 4.5,
-        reviews: 187,
-        priceRange: "$$",
-        location: "East Side",
-        distance: "1.5 mi",
-        availableTimes: ["6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"],
-    },
-];
-
-const CUISINES = ["All", "Italian", "French", "Japanese", "Chinese", "Mexican", "Indian", "Thai", "American"];
-const PRICE_RANGES = ["All", "$", "$$", "$$$", "$$$$"];
-const PARTY_SIZES = ["1", "2", "3", "4", "5", "6", "7", "8+"];
+// Helper to generate mock available times based on hours (since backend availability is complex)
+const getAvailableTimes = (hours) => {
+    // Simple mock logic: if open, return some slots
+    // In real app, this would check Reservation model availability
+    if (!hours) return ["6:00 PM", "7:00 PM", "8:00 PM"];
+    return ["5:00 PM", "6:30 PM", "7:00 PM", "8:15 PM"];
+};
 
 const FindTables = () => {
     const navigate = useNavigate();
+    const [restaurants, setRestaurants] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Filters
     const [searchQuery, setSearchQuery] = useState("");
-    const [date, setDate] = useState("2025-11-15");
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [time, setTime] = useState("7:00 PM");
     const [partySize, setPartySize] = useState("2");
     const [cuisine, setCuisine] = useState("All");
     const [priceRange, setPriceRange] = useState("All");
     const [showFilters, setShowFilters] = useState(false);
 
-    const filteredRestaurants = mockRestaurants.filter((restaurant) => {
+    useEffect(() => {
+        const fetchRestaurants = async () => {
+            try {
+                const res = await fetch('/api/restaurants');
+                const data = await res.json();
+
+                // Map backend data to UI format
+                // Note: Using images from seed or placeholders
+                const mappedData = data.map(r => ({
+                    id: r._id,
+                    name: r.name,
+                    cuisine: r.cuisineType,
+                    // Use seed images if available, else generic
+                    image: r.image || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+                    rating: 4.5, // Default rating as backend doesn't have reviews yet
+                    reviews: 0,
+                    priceRange: r.priceRange,
+                    location: r.address.city, // Neighborhood logic could go here
+                    distance: "1.2 mi", // Mock distance
+                    availableTimes: getAvailableTimes(r.operatingHours?.monFri),
+                    raw: r // Keep raw data if needed
+                }));
+
+                setRestaurants(mappedData);
+            } catch (err) {
+                console.error("Failed to fetch restaurants:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRestaurants();
+    }, []);
+
+    const filteredRestaurants = restaurants.filter((restaurant) => {
         const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCuisine = cuisine === "All" || restaurant.cuisine === cuisine;
         const matchesPrice = priceRange === "All" || restaurant.priceRange === priceRange;
         return matchesSearch && matchesCuisine && matchesPrice;
     });
+
+    const CUISINES = ["All", "Italian", "French", "Japanese", "Chinese", "Mexican", "Indian", "American"];
+    const PRICE_RANGES = ["All", "$", "$$", "$$$", "$$$$"];
+    const PARTY_SIZES = ["1", "2", "3", "4", "5", "6", "7", "8+"];
 
     const handleBookTime = (restaurantId, selectedTime) => {
         console.log("Booking:", { restaurantId, date, time: selectedTime, partySize });

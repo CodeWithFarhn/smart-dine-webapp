@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 
 const OpeningHoursPage = () => {
-    const [schedule, setSchedule] = useState([
+    const defaultSchedule = [
         { day: "Monday", open: true, slots: [{ id: "1", startTime: "17:00", endTime: "22:00" }] },
         { day: "Tuesday", open: true, slots: [{ id: "2", startTime: "17:00", endTime: "22:00" }] },
         { day: "Wednesday", open: true, slots: [{ id: "3", startTime: "17:00", endTime: "22:00" }] },
@@ -11,12 +11,33 @@ const OpeningHoursPage = () => {
         { day: "Friday", open: true, slots: [{ id: "5", startTime: "17:00", endTime: "23:00" }] },
         { day: "Saturday", open: true, slots: [{ id: "6", startTime: "17:00", endTime: "23:00" }] },
         { day: "Sunday", open: false, slots: [] },
-    ]);
+    ];
 
-    const [blackoutDates, setBlackoutDates] = useState([
-        { id: "1", date: "2025-12-25", reason: "Christmas" },
-        { id: "2", date: "2025-01-01", reason: "New Year" },
-    ]);
+    const [schedule, setSchedule] = useState(defaultSchedule);
+    const [blackoutDates, setBlackoutDates] = useState([]);
+    const [restaurantId, setRestaurantId] = useState(null);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (!userInfo) return;
+
+            const restRes = await fetch(`/api/restaurants`, { headers: { Authorization: `Bearer ${userInfo.token}` } });
+            const all = await res.json();
+            const myRest = all.find(r => r.owner === userInfo._id) || all[0];
+
+            if (myRest) {
+                setRestaurantId(myRest._id);
+                if (myRest.operatingHours && Array.isArray(myRest.operatingHours) && myRest.operatingHours.length > 0) {
+                    setSchedule(myRest.operatingHours);
+                }
+                if (myRest.blackoutDates) {
+                    setBlackoutDates(myRest.blackoutDates);
+                }
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const updateDayStatus = (day, open) => {
         setSchedule(schedule.map(d =>
@@ -66,9 +87,31 @@ const OpeningHoursPage = () => {
         setBlackoutDates(blackoutDates.filter(d => d.id !== id));
     };
 
-    const handleSave = () => {
-        console.log("Availability saved:", { schedule, blackoutDates });
-        alert("Your restaurant availability has been updated.");
+    const handleSave = async () => {
+        if (!restaurantId) return;
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const res = await fetch(`/api/restaurants/${restaurantId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({
+                    operatingHours: schedule,
+                    blackoutDates: blackoutDates
+                })
+            });
+
+            if (res.ok) {
+                alert("Your restaurant availability has been updated.");
+            } else {
+                alert("Failed to save settings.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error saving settings.");
+        }
     };
 
     return (

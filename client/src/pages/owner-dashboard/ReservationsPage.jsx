@@ -1,84 +1,99 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 import ReservationTable from '../../components/owner-dashboard/ReservationTable';
 
 // Mock Data from User's Request
-const mockReservations = [
-    {
-        id: "1",
-        customer: "John Smith",
-        date: "Nov 15, 2025",
-        time: "7:00 PM",
-        party: 4,
-        status: "Confirmed",
-        phone: "+1 555-0101",
-        email: "john@example.com",
-    },
-    {
-        id: "2",
-        customer: "Sarah Johnson",
-        date: "Nov 15, 2025",
-        time: "7:30 PM",
-        party: 2,
-        status: "Pending",
-        phone: "+1 555-0102",
-        email: "sarah@example.com",
-    },
-    {
-        id: "3",
-        customer: "Mike Davis",
-        date: "Nov 16, 2025",
-        time: "8:00 PM",
-        party: 6,
-        status: "Confirmed",
-        phone: "+1 555-0103",
-        email: "mike@example.com",
-    },
-    {
-        id: "4",
-        customer: "Emily Brown",
-        date: "Nov 17, 2025",
-        time: "6:30 PM",
-        party: 3,
-        status: "Pending",
-        phone: "+1 555-0104",
-        email: "emily@example.com",
-    },
-];
+// Mock Data removed - using API
+
 
 const ReservationsPage = () => {
-    const [reservations, setReservations] = useState(mockReservations);
+    const [reservations, setReservations] = useState([]);
     const [activeTab, setActiveTab] = useState('all');
+
+    // Fetch Reservations
+    useEffect(() => {
+        const fetchReservations = async () => {
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                // In a real app we'd get the restaurant ID from the user info or a separate API call
+                // For this demo/MVP, we'll assume the user object includes the restaurant ID or we fetch it
+                // TEMPORARY: Fetch the first restaurant owned by this user
+                const restRes = await fetch(`/api/restaurants`, {
+                    headers: { Authorization: `Bearer ${userInfo.token}` }
+                });
+                const restaurants = await restRes.json();
+                // Find restaurant owned by this user (mock logic if API doesn't filter perfectly yet)
+                const myRestaurant = restaurants.find(r => r.owner === userInfo._id) || restaurants[0]; // Fallback
+
+                if (myRestaurant) {
+                    const res = await fetch(`/api/reservations/restaurant/${myRestaurant._id}`, {
+                        headers: { Authorization: `Bearer ${userInfo.token}` }
+                    });
+                    const data = await res.json();
+
+                    // Map backend data to UI format
+                    const mappedData = data.map(r => ({
+                        id: r._id,
+                        customer: r.customerName,
+                        date: r.date,
+                        time: r.time,
+                        party: r.partySize,
+                        status: r.status || 'Pending',
+                        phone: r.customerPhone,
+                        email: r.customerEmail
+                    }));
+                    setReservations(mappedData);
+                }
+            } catch (error) {
+                console.error("Failed to fetch reservations", error);
+            }
+        };
+
+        fetchReservations();
+    }, []);
 
     // Filter Logic based on User's TabsContent structure
     const getFilteredReservations = () => {
         switch (activeTab) {
             case 'today':
-                return reservations.slice(0, 2);
+                // Simple string match for MVP date filtering
+                const today = new Date().toISOString().split('T')[0];
+                return reservations.filter(r => r.date === today);
             case 'upcoming':
-                return reservations.slice(2);
+                return reservations.filter(r => r.status !== 'Cancelled' && r.status !== 'Completed');
             case 'past':
-                return [];
+                return reservations.filter(r => r.status === 'Completed');
             case 'all':
             default:
                 return reservations;
         }
     };
 
-    const handleConfirm = (id) => {
-        setReservations(reservations.map(r =>
-            r.id === id ? { ...r, status: "Confirmed" } : r
-        ));
-        console.log('Confirmed:', id);
+    const updateStatus = async (id, status) => {
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            await fetch(`/api/reservations/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            // Optimistic update
+            setReservations(reservations.map(r =>
+                r.id === id ? { ...r, status } : r
+            ));
+        } catch (error) {
+            console.error("Failed to update status", error);
+            alert("Failed to update status");
+        }
     };
 
-    const handleCancel = (id) => {
-        setReservations(reservations.map(r =>
-            r.id === id ? { ...r, status: "Cancelled" } : r
-        ));
-        console.log('Cancelled:', id);
-    };
+    const handleConfirm = (id) => updateStatus(id, "Confirmed");
+    const handleCancel = (id) => updateStatus(id, "Cancelled");
 
     const handleContact = (id) => {
         console.log('Contact:', id);

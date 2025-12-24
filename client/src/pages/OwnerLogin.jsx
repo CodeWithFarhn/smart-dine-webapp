@@ -17,33 +17,27 @@ const OwnerLogin = () => {
         setError('');
 
         try {
-            // Mock Login for Owners
-            // In a real app, this would hit a separate endpoint or send a role flag
             const res = await fetch('/api/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
+
             const data = await res.json();
 
-            // Allow mock login for demo purposes
-            if (res.ok || (email === 'owner@restaurant.com')) {
-                const userInfo = res.ok ? data : { name: 'Restaurant Owner', email: 'owner@restaurant.com', role: 'owner' };
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                navigate('/manage/dashboard');
-                window.location.reload();
+            if (res.ok) {
+                if (data.role === 'owner' || data.role === 'admin') {
+                    localStorage.setItem('userInfo', JSON.stringify(data));
+                    navigate('/manage/dashboard');
+                    window.location.reload();
+                } else {
+                    setError('Access denied. This portal is for restaurant owners only.');
+                }
             } else {
                 setError(data.message || 'Invalid email or password');
             }
         } catch (err) {
-            // Fallback for demo
-            if (email === 'owner@restaurant.com') {
-                localStorage.setItem('userInfo', JSON.stringify({ name: 'Restaurant Owner', email: 'owner@restaurant.com', role: 'owner' }));
-                navigate('/manage/dashboard');
-                window.location.reload();
-            } else {
-                setError('Something went wrong. Please try again.');
-            }
+            setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
