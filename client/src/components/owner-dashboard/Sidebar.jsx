@@ -1,5 +1,5 @@
 import { Nav } from 'react-bootstrap';
-import { NavLink, useLocation, Link } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '../general/StyledAvatar';
 
 const Sidebar = () => {
@@ -33,6 +33,14 @@ const Sidebar = () => {
             <span>{label}</span>
         </Nav.Link>
     );
+
+    const navigate = useNavigate();
+    const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo');
+        navigate('/');
+    };
 
     return (
         <div className="bg-white border-end h-100 d-flex flex-column" style={{ width: '100%', minHeight: '100vh', overflowY: 'auto' }}>
@@ -68,19 +76,23 @@ const Sidebar = () => {
             <div className="mt-auto pt-3 border-top">
                 <div className="d-flex align-items-center gap-3 px-2 mb-3">
                     <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback>JD</AvatarFallback>
+                        <AvatarImage src={`https://ui-avatars.com/api/?name=${userInfo.name || 'Owner'}&background=random`} alt={userInfo.name} />
+                        <AvatarFallback>{userInfo.name ? userInfo.name.charAt(0) : 'O'}</AvatarFallback>
                     </Avatar>
                     <div className="overflow-hidden">
-                        <p className="mb-0 fw-bold text-dark text-truncate">John Doe</p>
-                        <p className="mb-0 small text-secondary text-truncate">Owner / Manager</p>
+                        <p className="mb-0 fw-bold text-dark text-truncate">{userInfo.name || 'Restaurant Owner'}</p>
+                        <p className="mb-0 small text-secondary text-truncate">{userInfo.email || 'Manager'}</p>
                     </div>
                 </div>
 
-                <Nav.Link as={Link} to="/" className="d-flex align-items-center gap-3 px-3 py-2 text-dark rounded-3 hover-bg-light">
+                <div
+                    onClick={handleLogout}
+                    style={{ cursor: 'pointer' }}
+                    className="d-flex align-items-center gap-3 px-3 py-2 text-dark rounded-3 hover-bg-light"
+                >
                     <i className="bi bi-box-arrow-right text-muted"></i>
                     <span className="text-muted fw-medium">Logout</span>
-                </Nav.Link>
+                </div>
             </div>
         </div>
     );

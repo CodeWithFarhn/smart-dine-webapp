@@ -25,7 +25,6 @@ const RegisterScreen = () => {
         }
 
         try {
-            // Mock Register Logic for prototype
             const res = await fetch('/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,20 +32,15 @@ const RegisterScreen = () => {
             });
             const data = await res.json();
 
-            if (res.ok || true) { // Allow pass for demo
-                const userInfo = res.ok ? data : { name, email };
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            if (res.ok) {
+                localStorage.setItem('userInfo', JSON.stringify(data));
                 navigate('/');
-                window.location.reload();
             } else {
                 setError(data.message || 'Registration failed');
             }
         } catch (err) {
-            // Allow pass for demo
-            localStorage.setItem('userInfo', JSON.stringify({ name, email }));
-            navigate('/');
-            window.location.reload();
-            // setError('Something went wrong. Please try again.');
+            console.error(err);
+            setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }

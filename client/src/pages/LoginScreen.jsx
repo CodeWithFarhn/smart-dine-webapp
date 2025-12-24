@@ -17,7 +17,6 @@ const LoginScreen = () => {
         setError('');
 
         try {
-            // Mock Login Logic for prototype
             const res = await fetch('/api/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,24 +24,15 @@ const LoginScreen = () => {
             });
             const data = await res.json();
 
-            // Allow mock login if backend not ready or for demo
-            if (res.ok || (email === 'demo@user.com')) {
-                const userInfo = res.ok ? data : { name: 'Demo User', email: 'demo@user.com' };
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            if (res.ok) {
+                localStorage.setItem('userInfo', JSON.stringify(data));
                 navigate('/');
-                window.location.reload();
             } else {
                 setError(data.message || 'Invalid email or password');
             }
         } catch (err) {
-            // Fallback for demo if API fails
-            if (email === 'demo@user.com') {
-                localStorage.setItem('userInfo', JSON.stringify({ name: 'Demo User', email: 'demo@user.com' }));
-                navigate('/');
-                window.location.reload();
-            } else {
-                setError('Something went wrong. Please try again.');
-            }
+            console.error(err);
+            setError('Something went wrong. Please check your connection.');
         } finally {
             setLoading(false);
         }
