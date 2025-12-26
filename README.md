@@ -410,7 +410,7 @@ Password: password123
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -428,7 +428,7 @@ This project is licensed under the ISC License.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Farhan**
 
@@ -437,7 +437,7 @@ This project is licensed under the ISC License.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Bootstrap team for the excellent UI framework
 - MongoDB for cloud database services
