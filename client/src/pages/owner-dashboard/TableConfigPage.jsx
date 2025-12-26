@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 
-const TABLE_TYPES = ["standard", "booth", "window", "bar"];
+const TABLE_TYPES = ["Standard", "Booth", "High Top", "Outdoor"];
 const SECTIONS = ["Main Dining", "Outdoor", "Private", "Bar Area", "Lounge"];
 
 const TableConfigPage = () => {
@@ -50,7 +50,7 @@ const TableConfigPage = () => {
     const [newTable, setNewTable] = useState({
         number: "",
         capacity: "",
-        type: "standard",
+        type: "Standard",
         section: "Main Dining",
     });
 
@@ -83,7 +83,7 @@ const TableConfigPage = () => {
 
             if (res.ok) {
                 fetchTables(); // Refresh list
-                setNewTable({ number: "", capacity: "", type: "standard", section: "Main Dining" });
+                setNewTable({ number: "", capacity: "", type: "Standard", section: "Main Dining" });
             } else {
                 alert("Failed to add table");
             }
@@ -160,7 +160,7 @@ const TableConfigPage = () => {
                                     >
                                         {TABLE_TYPES.map((type) => (
                                             <option key={type} value={type}>
-                                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                {type}
                                             </option>
                                         ))}
                                     </Form.Select>

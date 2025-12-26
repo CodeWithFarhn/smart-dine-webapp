@@ -22,16 +22,63 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [phoneError, setPhoneError] = useState('');
+
+    // Pakistani phone number regex: +92 followed by 10 digits
+    const validatePakistaniPhone = (phone) => {
+        const regex = /^\+92[0-9]{10}$/;
+        return regex.test(phone);
+    };
+
+    const handlePhoneChange = (value) => {
+        setBookingData({ ...bookingData, phone: value });
+        if (value && !validatePakistaniPhone(value)) {
+            setPhoneError('Phone must be in format: +923XXXXXXXXX');
+        } else {
+            setPhoneError('');
+        }
+    };
 
     const handleConfirm = async () => {
+        // Validate required fields
+        if (!bookingData.date || !bookingData.time || !bookingData.name || !bookingData.email || !bookingData.phone) {
+            setError('Please fill in all required fields');
+            return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(bookingData.email)) {
+            setError('Please enter a valid email address');
+            return;
+        }
+
+        // Validate phone number format
+        if (!validatePakistaniPhone(bookingData.phone)) {
+            setError('Please enter a valid Pakistani phone number (e.g., +923272939028)');
+            return;
+        }
+
+        // Check if user is logged in
+        const userInfo = localStorage.getItem('userInfo');
+        if (!userInfo) {
+            setError('Please log in to make a reservation');
+            // Optional: redirect to login
+            // window.location.href = '/login';
+            return;
+        }
+
         try {
             setLoading(true);
             setError('');
 
+            const user = JSON.parse(userInfo);
+
             const res = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
                 },
                 body: JSON.stringify({
                     restaurantId: restaurantName.id, // ID passed via props (needs update in parent)
@@ -228,11 +275,16 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
                                         <Form.Label className="fw-bold small">Phone</Form.Label>
                                         <Form.Control
                                             type="tel"
-                                            placeholder="+1 (555) 000-0000"
-                                            className="py-2 border-secondary-subtle"
+                                            placeholder="+923XXXXXXXXX"
+                                            className={`py-2 border-secondary-subtle ${phoneError ? 'is-invalid' : ''}`}
                                             value={bookingData.phone}
-                                            onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                                            onChange={(e) => handlePhoneChange(e.target.value)}
                                         />
+                                        {phoneError && (
+                                            <Form.Text className="text-danger small">
+                                                {phoneError}
+                                            </Form.Text>
+                                        )}
                                     </Col>
                                 </Row>
 
@@ -247,6 +299,12 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
                                     />
                                 </div>
 
+                                {error && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {error}
+                                    </div>
+                                )}
+
                                 <div className="d-flex gap-3">
                                     <Button variant="outline-secondary" className="w-100 py-2" onClick={handleClose}>
                                         Cancel
@@ -256,8 +314,9 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
                                         className="w-100 py-2 fw-bold text-white border-0"
                                         style={{ backgroundColor: '#e2ae85' }} // Beige/Orange from mockup
                                         onClick={handleConfirm}
+                                        disabled={loading || !bookingData.date || !bookingData.time || !bookingData.name || !bookingData.email || !bookingData.phone}
                                     >
-                                        Confirm Booking
+                                        {loading ? 'Processing...' : 'Confirm Booking'}
                                     </Button>
                                 </div>
 
@@ -275,7 +334,7 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
                             <p className="text-secondary mb-4">Your reservation has been successfully confirmed.</p>
 
                             <div className="bg-light p-4 rounded-4 mb-4 text-start">
-                                <h5 className="fw-bold mb-2 font-serif">{restaurantName}</h5>
+                                <h5 className="fw-bold mb-2 font-serif">{typeof restaurantName === 'object' ? restaurantName.name : restaurantName}</h5>
                                 <div className="d-flex align-items-center gap-2 text-secondary mb-1">
                                     <i className="bi bi-calendar-event"></i>
                                     <span>{bookingData.date || 'Today'} at {bookingData.time}</span>

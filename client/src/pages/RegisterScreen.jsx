@@ -10,13 +10,36 @@ const RegisterScreen = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
 
     const navigate = useNavigate();
+
+    // Email validation regex
+    const validateEmail = (email) => {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
+
+    const handleEmailChange = (value) => {
+        setEmail(value);
+        if (value && !validateEmail(value)) {
+            setEmailError('Please enter a valid email address');
+        } else {
+            setEmailError('');
+        }
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            setError('Please enter a valid email address');
+            setLoading(false);
+            return;
+        }
 
         if (password !== confirmPassword) {
             setError('Passwords do not match');
@@ -30,7 +53,16 @@ const RegisterScreen = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })
             });
-            const data = await res.json();
+
+            // Check if response has content before parsing JSON
+            const text = await res.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                data = { message: 'Server error occurred' };
+            }
 
             if (res.ok) {
                 localStorage.setItem('userInfo', JSON.stringify(data));
@@ -40,7 +72,7 @@ const RegisterScreen = () => {
             }
         } catch (err) {
             console.error(err);
-            setError('Something went wrong. Please try again.');
+            setError('Network error. Please check if the server is running.');
         } finally {
             setLoading(false);
         }
@@ -72,9 +104,14 @@ const RegisterScreen = () => {
                         type='email'
                         placeholder='name@example.com'
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="p-3 bg-light border-0"
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        className={`p-3 bg-light border-0 ${emailError ? 'is-invalid' : ''}`}
                     />
+                    {emailError && (
+                        <Form.Text className="text-danger small d-block mt-1">
+                            {emailError}
+                        </Form.Text>
+                    )}
                 </Form.Group>
 
                 <Form.Group className='mb-3' controlId='password'>

@@ -47,6 +47,39 @@ const getTables = async (req, res) => {
     }
 };
 
+// @desc    Update a table
+// @route   PUT /api/tables/:id
+// @access  Private (Owner)
+const updateTable = async (req, res) => {
+    try {
+        const table = await Table.findById(req.params.id);
+
+        if (!table) {
+            return res.status(404).json({ message: 'Table not found' });
+        }
+
+        // Verify ownership
+        const restaurant = await Restaurant.findById(table.restaurant);
+        if (restaurant.owner.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        const { name, capacity, type, section, status } = req.body;
+        
+        table.name = name || table.name;
+        table.capacity = capacity || table.capacity;
+        table.type = type || table.type;
+        table.section = section || table.section;
+        table.status = status || table.status;
+
+        const updatedTable = await table.save();
+        res.json(updatedTable);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 // @desc    Delete a table
 // @route   DELETE /api/tables/:id
 // @access  Private (Owner)
@@ -75,5 +108,6 @@ const deleteTable = async (req, res) => {
 module.exports = {
     addTable,
     getTables,
+    updateTable,
     deleteTable
 };

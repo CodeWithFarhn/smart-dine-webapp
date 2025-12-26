@@ -63,6 +63,11 @@ const getRestaurants = async (req, res) => {
 // @access  Public
 const getRestaurantById = async (req, res) => {
     try {
+        // Validate ObjectId format
+        if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'Invalid restaurant ID format' });
+        }
+
         const restaurant = await Restaurant.findById(req.params.id);
 
         if (restaurant) {
@@ -71,6 +76,7 @@ const getRestaurantById = async (req, res) => {
             res.status(404).json({ message: 'Restaurant not found' });
         }
     } catch (error) {
+        console.error('Error fetching restaurant:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

@@ -4,6 +4,21 @@ import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 
 const SettingsPage = () => {
     const [activeTab, setActiveTab] = useState('profile');
+    const [phoneError, setPhoneError] = useState('');
+    const [emailError, setEmailError] = useState('');
+
+    // Pakistani phone number regex: +92 followed by 10 digits
+    const validatePakistaniPhone = (phone) => {
+        const regex = /^\+92[0-9]{10}$/;
+        return regex.test(phone);
+    };
+
+    // Email validation regex
+    const validateEmail = (email) => {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
+
     const [settings, setSettings] = useState({
         restaurantName: "La Bella Italia",
         email: "info@labellaitalia.com",
@@ -60,9 +75,24 @@ const SettingsPage = () => {
                                             <Form.Label className="small fw-bold">Email</Form.Label>
                                             <Form.Control
                                                 type="email"
+                                                placeholder="restaurant@example.com"
+                                                className={emailError ? 'is-invalid' : ''}
                                                 value={settings.email}
-                                                onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setSettings({ ...settings, email: value });
+                                                    if (value && !validateEmail(value)) {
+                                                        setEmailError('Please enter a valid email address');
+                                                    } else {
+                                                        setEmailError('');
+                                                    }
+                                                }}
                                             />
+                                            {emailError && (
+                                                <Form.Text className="text-danger small d-block mt-1">
+                                                    {emailError}
+                                                </Form.Text>
+                                            )}
                                         </Form.Group>
                                     </Col>
 
@@ -71,9 +101,24 @@ const SettingsPage = () => {
                                             <Form.Label className="small fw-bold">Phone</Form.Label>
                                             <Form.Control
                                                 type="tel"
+                                                placeholder="+923XXXXXXXXX"
+                                                className={phoneError ? 'is-invalid' : ''}
                                                 value={settings.phone}
-                                                onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setSettings({ ...settings, phone: value });
+                                                    if (value && !validatePakistaniPhone(value)) {
+                                                        setPhoneError('Phone must be in format: +923XXXXXXXXX');
+                                                    } else {
+                                                        setPhoneError('');
+                                                    }
+                                                }}
                                             />
+                                            {phoneError && (
+                                                <Form.Text className="text-danger small d-block mt-1">
+                                                    {phoneError}
+                                                </Form.Text>
+                                            )}
                                         </Form.Group>
                                     </Col>
 

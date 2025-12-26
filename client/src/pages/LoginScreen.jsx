@@ -8,13 +8,35 @@ const LoginScreen = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
 
     const navigate = useNavigate();
+
+    const validateEmail = (email) => {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
+
+    const handleEmailChange = (value) => {
+        setEmail(value);
+        if (value && !validateEmail(value)) {
+            setEmailError('Please enter a valid email address');
+        } else {
+            setEmailError('');
+        }
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            setError('Please enter a valid email address');
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch('/api/users/login', {
@@ -22,7 +44,16 @@ const LoginScreen = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            const data = await res.json();
+
+            // Check if response has content before parsing JSON
+            const text = await res.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                data = { message: 'Server error occurred' };
+            }
 
             // Allow mock login if backend not ready or for demo
             if (res.ok || (email === 'demo@user.com')) {
@@ -33,14 +64,15 @@ const LoginScreen = () => {
             } else {
                 setError(data.message || 'Invalid email or password');
             }
-        } catch {
+        } catch (err) {
+            console.error(err);
             // Fallback for demo if API fails
             if (email === 'demo@user.com') {
                 localStorage.setItem('userInfo', JSON.stringify({ name: 'Demo User', email: 'demo@user.com' }));
                 navigate('/');
                 window.location.reload();
             } else {
-                setError('Something went wrong. Please try again.');
+                setError('Network error. Please check if the server is running.');
             }
         } finally {
             setLoading(false);
@@ -62,9 +94,14 @@ const LoginScreen = () => {
                         type='email'
                         placeholder='Enter your email'
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="p-3 bg-light border-0"
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        className={`p-3 bg-light border-0 ${emailError ? 'is-invalid' : ''}`}
                     />
+                    {emailError && (
+                        <Form.Text className="text-danger small d-block mt-1">
+                            {emailError}
+                        </Form.Text>
+                    )}
                 </Form.Group>
 
                 <Form.Group className='mb-4' controlId='password'>

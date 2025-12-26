@@ -8,13 +8,36 @@ const OwnerLogin = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
 
     const navigate = useNavigate();
+
+    // Email validation regex
+    const validateEmail = (email) => {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
+
+    const handleEmailChange = (value) => {
+        setEmail(value);
+        if (value && !validateEmail(value)) {
+            setEmailError('Please enter a valid email address');
+        } else {
+            setEmailError('');
+        }
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            setError('Please enter a valid email address');
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch('/api/users/login', {
@@ -58,9 +81,14 @@ const OwnerLogin = () => {
                         type='email'
                         placeholder='owner@restaurant.com'
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="p-3 bg-light border-0"
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        className={`p-3 bg-light border-0 ${emailError ? 'is-invalid' : ''}`}
                     />
+                    {emailError && (
+                        <Form.Text className="text-danger small d-block mt-1">
+                            {emailError}
+                        </Form.Text>
+                    )}
                 </Form.Group>
 
                 <Form.Group className='mb-4' controlId='password'>

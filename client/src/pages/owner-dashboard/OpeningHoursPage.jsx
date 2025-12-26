@@ -23,7 +23,7 @@ const OpeningHoursPage = () => {
             if (!userInfo) return;
 
             const restRes = await fetch(`/api/restaurants`, { headers: { Authorization: `Bearer ${userInfo.token}` } });
-            const all = await res.json();
+            const all = await restRes.json();
             const myRest = all.find(r => r.owner === userInfo._id) || all[0];
 
             if (myRest) {

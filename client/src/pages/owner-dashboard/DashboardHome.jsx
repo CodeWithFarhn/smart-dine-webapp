@@ -104,6 +104,8 @@ const DashboardHome = () => {
                             },
                         }}>
                             <AreaChart
+                                width={600}
+                                height={280}
                                 data={[
                                     { month: "Jan", revenue: 1500, bookings: 120 },
                                     { month: "Feb", revenue: 2300, bookings: 180 },

@@ -162,7 +162,7 @@ const RestaurantDetails = () => {
                             <span>({restaurant.reviewCount} reviews)</span>
                         </span>
                         <span className="d-flex align-items-center gap-1">
-                            <i className="bi bi-geo-alt-fill"></i> {restaurant.address}
+                            <i className="bi bi-geo-alt-fill"></i> {typeof restaurant.address === 'object' ? `${restaurant.address.street}, ${restaurant.address.city}, ${restaurant.address.state} ${restaurant.address.zipCode}` : restaurant.address}
                         </span>
                     </div>
                 </Container>

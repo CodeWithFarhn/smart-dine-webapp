@@ -40,7 +40,16 @@ const FeaturedRestaurants = () => {
     const navigate = useNavigate();
 
     const handleBook = (id) => {
-        navigate(`/restaurant/${id}`);
+        // Check if user is logged in
+        const userInfo = localStorage.getItem('userInfo');
+        
+        if (!userInfo) {
+            // If not logged in, redirect to login page
+            navigate('/login');
+        } else {
+            // If logged in, navigate to restaurant details
+            navigate(`/restaurant/${id}`);
+        }
     };
 
     return (

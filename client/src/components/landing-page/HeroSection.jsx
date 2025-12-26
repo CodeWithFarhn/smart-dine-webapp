@@ -1,9 +1,15 @@
 import { Container, Form, Button, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../../assets/hero-bg.png';
+import { useEffect, useState } from 'react';
 
 const HeroSection = ({ onSearch }) => {
     const navigate = useNavigate();
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        setIsVisible(true);
+    }, []);
 
     const handleFindTables = () => {
         navigate("/find-tables");
@@ -11,6 +17,53 @@ const HeroSection = ({ onSearch }) => {
 
     return (
         <div style={{ position: 'relative', minHeight: '600px', height: '60vh', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                .hero-content {
+                    animation: fadeInUp 0.8s ease-out forwards;
+                }
+
+                .hero-title {
+                    animation: fadeInUp 1s ease-out 0.2s forwards;
+                    opacity: 0;
+                }
+
+                .hero-subtitle {
+                    animation: fadeInUp 1s ease-out 0.4s forwards;
+                    opacity: 0;
+                }
+
+                .hero-search {
+                    animation: fadeInUp 1s ease-out 0.6s forwards;
+                    opacity: 0;
+                }
+
+                .hero-search input:focus {
+                    transform: scale(1.02);
+                    transition: transform 0.2s ease;
+                }
+
+                .hero-search button:hover {
+                    transform: translateY(-2px);
+                    transition: transform 0.2s ease;
+                }
+            `}</style>
 
             {/* Background Image */}
             <div style={{
@@ -37,15 +90,15 @@ const HeroSection = ({ onSearch }) => {
             }} />
 
             {/* Content */}
-            <Container style={{ position: 'relative', zIndex: 2, maxWidth: '850px' }} className="text-center px-4">
-                <h1 className="display-4 fw-bold text-white mb-4 font-serif">
+            <Container style={{ position: 'relative', zIndex: 2, maxWidth: '850px' }} className="text-center px-4 hero-content">
+                <h1 className="display-4 fw-bold text-white mb-4 font-serif hero-title">
                     Reserve Your Perfect Table
                 </h1>
-                <p className="fs-5 text-white opacity-75 mb-5 mx-auto" style={{ maxWidth: '600px' }}>
+                <p className="fs-5 text-white opacity-75 mb-5 mx-auto hero-subtitle" style={{ maxWidth: '600px' }}>
                     Discover and book the finest dining experiences in your city
                 </p>
 
-                <div className="d-flex flex-column flex-sm-row gap-3 mx-auto" style={{ maxWidth: '650px' }}>
+                <div className="d-flex flex-column flex-sm-row gap-3 mx-auto hero-search" style={{ maxWidth: '650px' }}>
                     <div className="flex-grow-1 position-relative">
                         <InputGroup className="h-100">
                             <InputGroup.Text className="bg-white border-0 ps-3 bg-opacity-75">

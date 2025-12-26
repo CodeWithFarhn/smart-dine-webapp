@@ -7,6 +7,22 @@ const RestaurantRegister = () => {
 
     // Basic form state
     const [step, setStep] = useState(1);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [phoneError, setPhoneError] = useState('');
+    const [emailError, setEmailError] = useState('');
+
+    // Pakistani phone number regex: +92 followed by 10 digits
+    const validatePakistaniPhone = (phone) => {
+        const regex = /^\+92[0-9]{10}$/;
+        return regex.test(phone);
+    };
+
+    const validateEmail = (email) => {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email);
+    };
+
     const [formData, setFormData] = useState({
         // Auth
         email: '',
@@ -33,7 +49,26 @@ const RestaurantRegister = () => {
     });
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        
+        // Validate phone number
+        if (name === 'phone') {
+            if (value && !validatePakistaniPhone(value)) {
+                setPhoneError('Phone must be in format: +923XXXXXXXXX');
+            } else {
+                setPhoneError('');
+            }
+        }
+        
+        // Validate email
+        if (name === 'email') {
+            if (value && !validateEmail(value)) {
+                setEmailError('Please enter a valid email address');
+            } else {
+                setEmailError('');
+            }
+        }
     };
 
     const nextStep = (e) => {
@@ -52,11 +87,24 @@ const RestaurantRegister = () => {
         window.scrollTo(0, 0);
     };
 
-    const [loading, setLoading] = useState(false);
-
     const submitHandler = async (e) => {
         e.preventDefault();
+        setError('');
         setLoading(true);
+
+        // Validate email format
+        if (!validateEmail(formData.email)) {
+            setError('Please enter a valid email address');
+            setLoading(false);
+            return;
+        }
+
+        // Validate phone number format
+        if (!validatePakistaniPhone(formData.phone)) {
+            setError('Please enter a valid Pakistani phone number (e.g., +923272939028)');
+            setLoading(false);
+            return;
+        }
 
         try {
             // 1. Register User (Owner)
@@ -146,6 +194,12 @@ const RestaurantRegister = () => {
 
                 <Card className="border-0 shadow-lg p-3 p-md-5 rounded-4">
                     <Card.Body>
+                        {error && (
+                            <Alert variant="danger" onClose={() => setError('')} dismissible>
+                                {error}
+                            </Alert>
+                        )}
+                        
                         <Form onSubmit={step === 3 ? submitHandler : nextStep}>
 
                             {/* STEP 1: ACCOUNT & BASIC INFO */}
@@ -160,7 +214,20 @@ const RestaurantRegister = () => {
                                             <Col md={12}>
                                                 <Form.Group className="mb-3" controlId="email">
                                                     <Form.Label className="fw-bold small">Email Address *</Form.Label>
-                                                    <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required className="py-2 border-0 shadow-sm" placeholder="owner@restaurant.com" />
+                                                    <Form.Control 
+                                                        type="email" 
+                                                        name="email" 
+                                                        value={formData.email} 
+                                                        onChange={handleChange} 
+                                                        required 
+                                                        className={`py-2 border-0 shadow-sm ${emailError ? 'is-invalid' : ''}`}
+                                                        placeholder="owner@restaurant.com" 
+                                                    />
+                                                    {emailError && (
+                                                        <Form.Text className="text-danger small d-block mt-1">
+                                                            {emailError}
+                                                        </Form.Text>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
                                             <Col md={6}>
@@ -254,7 +321,20 @@ const RestaurantRegister = () => {
 
                                     <Form.Group className="mb-4" controlId="phone">
                                         <Form.Label className="fw-bold small">Restaurant Phone *</Form.Label>
-                                        <Form.Control type="tel" name="phone" placeholder="+1 (555) 123-4567" value={formData.phone} onChange={handleChange} className="py-2" required />
+                                        <Form.Control 
+                                            type="tel" 
+                                            name="phone" 
+                                            placeholder="+923XXXXXXXXX" 
+                                            value={formData.phone} 
+                                            onChange={handleChange} 
+                                            className={`py-2 ${phoneError ? 'is-invalid' : ''}`}
+                                            required 
+                                        />
+                                        {phoneError && (
+                                            <Form.Text className="text-danger small d-block mt-1">
+                                                {phoneError}
+                                            </Form.Text>
+                                        )}
                                     </Form.Group>
                                 </>
                             )}
@@ -299,8 +379,11 @@ const RestaurantRegister = () => {
                                     type="submit"
                                     className="w-100 py-3 fw-bold text-white"
                                     style={{ backgroundColor: '#d94e1e', borderColor: '#d94e1e' }}
+                                    disabled={loading}
                                 >
-                                    {step === 3 ? (
+                                    {loading ? (
+                                        <>Processing...</>
+                                    ) : step === 3 ? (
                                         <>Complete Registration <i className="bi bi-check2 ms-2"></i></>
                                     ) : (
                                         <>Next Step <i className="bi bi-arrow-right ms-2"></i></>
