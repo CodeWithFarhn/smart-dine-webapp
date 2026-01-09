@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import AuthLayout from '../components/auth/AuthLayout';
+import { API_ENDPOINTS } from '../config/api';
 
 const OwnerLogin = () => {
     const [email, setEmail] = useState('');
@@ -40,7 +41,7 @@ const OwnerLogin = () => {
         }
 
         try {
-            const res = await fetch('/api/users/login', {
+            const res = await fetch(API_ENDPOINTS.LOGIN_USER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -59,7 +60,7 @@ const OwnerLogin = () => {
             } else {
                 setError(data.message || 'Invalid email or password');
             }
-        } catch (err) {
+        } catch {
             setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import AuthLayout from '../components/auth/AuthLayout';
+import { API_ENDPOINTS } from '../config/api';
 
 const RegisterScreen = () => {
     const [name, setName] = useState('');
@@ -48,7 +49,7 @@ const RegisterScreen = () => {
         }
 
         try {
-            const res = await fetch('/api/users', {
+            const res = await fetch(API_ENDPOINTS.REGISTER_USER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })

@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../components/general/StyledCard';
 import Badge from '../components/general/StyledBadge';
+import { API_ENDPOINTS } from '../config/api';
 
 // Helper to generate mock available times based on hours (since backend availability is complex)
 const getAvailableTimes = (hours) => {
@@ -29,7 +30,7 @@ const FindTables = () => {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                const res = await fetch('/api/restaurants');
+                const res = await fetch(API_ENDPOINTS.GET_RESTAURANTS);
                 const data = await res.json();
 
                 // Map backend data to UI format

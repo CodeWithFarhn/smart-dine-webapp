@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import AuthLayout from '../components/auth/AuthLayout';
+import { API_ENDPOINTS } from '../config/api';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
@@ -39,7 +40,7 @@ const LoginScreen = () => {
         }
 
         try {
-            const res = await fetch('/api/users/login', {
+            const res = await fetch(API_ENDPOINTS.LOGIN_USER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })

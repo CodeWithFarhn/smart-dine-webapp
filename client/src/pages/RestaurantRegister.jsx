@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Container, Row, Col, Form, Button, Card, ProgressBar, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config/api';
 
 const RestaurantRegister = () => {
     const navigate = useNavigate();
@@ -108,7 +109,7 @@ const RestaurantRegister = () => {
 
         try {
             // 1. Register User (Owner)
-            const userResponse = await fetch('/api/users', {
+            const userResponse = await fetch(API_ENDPOINTS.REGISTER_USER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -129,7 +130,7 @@ const RestaurantRegister = () => {
             localStorage.setItem('userInfo', JSON.stringify(userData));
 
             // 2. Register Restaurant
-            const restaurantResponse = await fetch('/api/restaurants', {
+            const restaurantResponse = await fetch(API_ENDPOINTS.CREATE_RESTAURANT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

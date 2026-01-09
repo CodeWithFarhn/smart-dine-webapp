@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
+import { API_ENDPOINTS } from '../../config/api';
 
 const TABLE_TYPES = ["Standard", "Booth", "High Top", "Outdoor"];
 const SECTIONS = ["Main Dining", "Outdoor", "Private", "Bar Area", "Lounge"];
@@ -11,7 +12,7 @@ const TableConfigPage = () => {
 
     // Helper to get restaurant ID
     const getRestaurantId = async (token, userId) => {
-        const res = await fetch(`/api/restaurants`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(API_ENDPOINTS.GET_RESTAURANTS, { headers: { Authorization: `Bearer ${token}` } });
         const all = await res.json();
         const myRest = all.find(r => r.owner === userId) || all[0];
         return myRest ? myRest._id : null;
@@ -25,7 +26,7 @@ const TableConfigPage = () => {
             const restId = await getRestaurantId(userInfo.token, userInfo._id);
 
             if (restId) {
-                const res = await fetch(`/api/tables/restaurant/${restId}`);
+                const res = await fetch(API_ENDPOINTS.GET_TABLES(restId));
                 const data = await res.json();
                 // Map backend data to UI format if needed
                 const mapped = data.map(t => ({

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import DashboardLayout from '../../components/owner-dashboard/DashboardLayout';
 import ReservationTable from '../../components/owner-dashboard/ReservationTable';
+import { API_ENDPOINTS } from '../../config/api';
 
 // Mock Data from User's Request
 // Mock Data removed - using API
@@ -19,7 +20,7 @@ const ReservationsPage = () => {
                 // In a real app we'd get the restaurant ID from the user info or a separate API call
                 // For this demo/MVP, we'll assume the user object includes the restaurant ID or we fetch it
                 // TEMPORARY: Fetch the first restaurant owned by this user
-                const restRes = await fetch(`/api/restaurants`, {
+                const restRes = await fetch(API_ENDPOINTS.GET_RESTAURANTS, {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 });
                 const restaurants = await restRes.json();
@@ -27,7 +28,7 @@ const ReservationsPage = () => {
                 const myRestaurant = restaurants.find(r => r.owner === userInfo._id) || restaurants[0]; // Fallback
 
                 if (myRestaurant) {
-                    const res = await fetch(`/api/reservations/restaurant/${myRestaurant._id}`, {
+                    const res = await fetch(API_ENDPOINTS.GET_RESTAURANT_RESERVATIONS(myRestaurant._id), {
                         headers: { Authorization: `Bearer ${userInfo.token}` }
                     });
                     const data = await res.json();

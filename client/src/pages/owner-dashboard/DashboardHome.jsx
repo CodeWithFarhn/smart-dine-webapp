@@ -5,6 +5,7 @@ import StatCard from '../../components/owner-dashboard/StatCard';
 import ReservationTable from '../../components/owner-dashboard/ReservationTable';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/general/StyledChart';
+import { API_ENDPOINTS } from '../../config/api';
 
 
 
@@ -26,7 +27,7 @@ const DashboardHome = () => {
                 if (!userInfo || !userInfo.token) return;
 
                 // 1. Get Restaurant ID
-                const restRes = await fetch(`/api/restaurants`, {
+                const restRes = await fetch(API_ENDPOINTS.GET_RESTAURANTS, {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 });
                 const restaurants = await restRes.json();

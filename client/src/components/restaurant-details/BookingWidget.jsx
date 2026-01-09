@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Card, Button, Modal, Form, Row, Col } from 'react-bootstrap';
+import { API_ENDPOINTS } from '../../config/api';
 
 const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaurant" }) => {
     const [showModal, setShowModal] = useState(false);
@@ -74,7 +75,7 @@ const BookingWidget = ({ selectedTable, onReserve, restaurantName = "the restaur
 
             const user = JSON.parse(userInfo);
 
-            const res = await fetch('/api/reservations', {
+            const res = await fetch(API_ENDPOINTS.CREATE_RESERVATION, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

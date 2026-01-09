@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Badge, Image, Button } from 'react-bootstrap';
 import BookingWidget from '../components/restaurant-details/BookingWidget';
 import VisualTableSelector from '../components/restaurant-details/VisualTableSelector';
+import { API_ENDPOINTS } from '../config/api';
 
 // Mock Data Lookup (In a real app, this would be an API call)
 const text = "Experience authentic Italian cuisine in an elegant setting. Our chef brings traditional recipes from Naples, combining fresh ingredients with time-honored cooking techniques.";
